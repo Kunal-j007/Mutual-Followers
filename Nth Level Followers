@@ -1,0 +1,53 @@
+package sample;
+
+import java.util.*;
+public class NthLevelFollowers {
+    public static List<Integer> findNthLevelFollowers(int findId, int n, List<Map<String, Object>> users) {
+        // Build graph: userId -> List of followedIds
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+        for (Map<String, Object> user : users) {
+            int id = (Integer) user.get("id");
+            List<Integer> follows = (List<Integer>) user.get("follows");
+            graph.put(id, follows);
+        }
+        Queue<Integer> queue = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();
+        queue.offer(findId);
+        visited.add(findId);
+        int level = 0;
+        while (!queue.isEmpty() && level < n) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                int current = queue.poll();
+                List<Integer> neighbors = graph.getOrDefault(current, new ArrayList<>());
+                for (int neighbor : neighbors) {
+                    if (!visited.contains(neighbor)) {
+                        queue.offer(neighbor);
+                        visited.add(neighbor);
+                    }
+                }
+            }
+            level++;
+        }
+        List<Integer> result = new ArrayList<>(queue);
+        Collections.sort(result);
+        return result;
+    }
+    public static void main(String[] args) {
+        List<Map<String, Object>> users = List.of(
+            Map.of("id", 1, "name", "Alice", "follows", List.of(2, 3)),
+            Map.of("id", 2, "name", "Bob", "follows", List.of(4)),
+            Map.of("id", 3, "name", "Charlie", "follows", List.of(4, 5)),
+            Map.of("id", 4, "name", "David", "follows", List.of(6)),
+            Map.of("id", 5, "name", "Eva", "follows", List.of(6)),
+            Map.of("id", 6, "name", "Frank", "follows", List.of())
+        );
+        int findId = 1;
+        int n = 2;
+        List<Integer> output = findNthLevelFollowers(findId, n, users);
+        Map<String, Object> finalOutput = new LinkedHashMap<>();
+        finalOutput.put("regNo", "REG12347");
+        finalOutput.put("outcome", output);
+        System.out.println(finalOutput);
+    }
+}
