@@ -1,0 +1,58 @@
+package sample;
+
+import java.util.*;
+
+public class MutualFollowers {
+	
+    public static List<List<Integer>> findMutualFollowers(List<Map<String, Object>> users) {
+    	
+        Map<Integer, Set<Integer>> followsMap = new HashMap<>();
+
+        for (Map<String, Object> user : users) {
+            int id = (Integer) user.get("id");
+            List<Integer> follows = (List<Integer>) user.get("follows");
+            followsMap.put(id, new HashSet<>(follows));
+        }
+
+        Set<String> seenPairs = new HashSet<>();
+        List<List<Integer>> mutualPairs = new ArrayList<>();
+
+        for (Map.Entry<Integer, Set<Integer>> entry : followsMap.entrySet()) {
+            int userId = entry.getKey();
+            for (int followedId : entry.getValue()) {
+                if (followsMap.containsKey(followedId)
+                        && followsMap.get(followedId).contains(userId)) {
+
+                    int min = Math.min(userId, followedId);
+                    int max = Math.max(userId, followedId);
+                    String key = min + "-" + max;
+
+                    if (!seenPairs.contains(key)) {
+                        mutualPairs.add(Arrays.asList(min, max));
+                        seenPairs.add(key);
+                    }
+                }
+            }
+        }
+
+        return mutualPairs;
+    }
+    
+    
+    public static void main(String[] args) {
+        List<Map<String, Object>> users = List.of(
+            Map.of("id", 1, "name", "Alice", "follows", List.of(2, 3)),
+            Map.of("id", 2, "name", "Bob", "follows", List.of(1)),
+            Map.of("id", 3, "name", "Charlie", "follows", List.of(4)),
+            Map.of("id", 4, "name", "David", "follows", List.of(3))
+        );
+
+        List<List<Integer>> result = findMutualFollowers(users);
+
+        Map<String, Object> finalOutput = new LinkedHashMap<>();
+        finalOutput.put("regNo", "REG12347");
+        finalOutput.put("outcome", result);
+
+        System.out.println(finalOutput);
+    }
+}
